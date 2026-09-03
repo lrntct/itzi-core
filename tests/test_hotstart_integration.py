@@ -74,7 +74,7 @@ def create_sim_config(
         ),
         output_map_names=helpers.make_output_map_names(
             "out_hotstart",
-            ["water_depth", "qx", "qy", "created_volume"],
+            ["water_depth", "qx", "qy", "created_volume", "mean_rainfall"],
         ),
         surface_flow_parameters=SurfaceFlowParameters(hmin=0.0001, dtmax=0.3, cfl=0.2),
         infiltration_model=InfiltrationModelType.GREEN_AMPT,
@@ -350,6 +350,15 @@ def test_roundtrip_state_restoration_and_match(
     # Skip initialize() because hotstart already restored all necessary state
     # Calling initialize() would overwrite restored state (old_domain_volume, accum arrays, etc.)
     run_simulation_to_end(sim_b, skip_initialize=True)
+
+    resumed_output = sim_b.report.raster_provider
+    assert isinstance(resumed_output, MemoryRasterOutputProvider)
+    _, mean_rainfall = resumed_output.output_maps_dict["mean_rainfall"][0]
+    np.testing.assert_allclose(
+        mean_rainfall,
+        domain_5by5.arr_rain * 3_600_000,
+        rtol=1e-5,
+    )
 
     # Step 4: Verify final results match uninterrupted reference
     # Use qe/qs (internal flow arrays) instead of qx/qy (output arrays computed on-the-fly)
