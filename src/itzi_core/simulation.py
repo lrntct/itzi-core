@@ -564,16 +564,13 @@ class Simulation:
             if not self.drainage_model:
                 self.schedule.set_deadline("drainage", self.end_time)
 
+        # Accumulators begin at the last archived report boundary, independently
+        # of the cadence selected for the resumed run.
+        self.report.last_step = self.schedule.deadline("record") - hotstart_config.record_step
         if self.report.dt != hotstart_config.record_step:
-            # Accumulators still begin at the last archived report boundary,
-            # independently of the cadence selected for the resumed run.
-            self.report.last_step = self.schedule.deadline("record") - hotstart_config.record_step
             self.schedule.set_deadline(
                 "record", min(self.end_time, self.sim_time + self.report.dt)
             )
-        else:
-            # The restored deadline is the next regular report after the last one.
-            self.report.last_step = self.schedule.deadline("record") - self.report.dt
 
         if self.hydrology_model.dt != timedelta(seconds=hotstart_config.dtinf):
             self.schedule.set_deadline(
