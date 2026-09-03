@@ -481,6 +481,12 @@ def test_resume_applies_new_record_step_cadence(
     ]
 
     assert resumed_record_times[: len(expected_record_times)] == expected_record_times
+    _, mean_rainfall = resumed_output.output_maps_dict["mean_rainfall"][0]
+    np.testing.assert_allclose(
+        mean_rainfall,
+        domain_5by5.arr_rain * 3_600_000,
+        rtol=1e-5,
+    )
 
     assert_state_differs(sim_b, record_step_hotstart_run["simulation"])
 
