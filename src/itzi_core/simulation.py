@@ -569,6 +569,9 @@ class Simulation:
                 "record", min(self.end_time, self.sim_time + self.report.dt)
             )
             self.report.last_step = copy.copy(self.sim_time)
+        else:
+            # The restored deadline is the next regular report after the last one.
+            self.report.last_step = self.schedule.deadline("record") - self.report.dt
 
         if self.hydrology_model.dt != timedelta(seconds=hotstart_config.dtinf):
             self.schedule.set_deadline(
