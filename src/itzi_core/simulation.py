@@ -65,7 +65,7 @@ class Simulation:
         hydrology_model: Hydrology,
         surface_flow: SurfaceFlowSimulation,
         drainage_model: DrainageSimulation | None,
-        drainage_nodes_list: list[DrainageNodeCouplingData],
+        drainage_nodes_list: tuple[DrainageNodeCouplingData, ...],
         report: Report,
     ):
         self.sim_config = sim_config
@@ -163,6 +163,9 @@ class Simulation:
             self._update_accum_array(arr_key, self.sim_time)
         self.continuity_data = self.get_continuity_data()
         # Pass data to the reporting module
+        self.report.start(
+            self.drainage_model.get_drainage_network_topology() if self.drainage_model else None
+        )
         self.report.step(self._build_simulation_data(self.sim_time, 0))
 
         # d. Reset accumulators
@@ -243,6 +246,11 @@ class Simulation:
         # Reporting last to get simulated values #
         if should_write_report:
             logger.debug(f"{step_end}: Writing output maps...")
+            self.report.start(
+                self.drainage_model.get_drainage_network_topology()
+                if self.drainage_model
+                else None
+            )
             self.report.step(
                 self._build_simulation_data(
                     sim_time=step_end,
@@ -336,9 +344,9 @@ class Simulation:
             k: self.raster_domain.get_unmasked(k) for k in self.raster_domain.k_accum
         }
         if self.drainage_model:
-            drainage_network_data = self.drainage_model.get_drainage_network_data()
+            drainage_network_attributes = self.drainage_model.get_drainage_network_attributes()
         else:
-            drainage_network_data = None
+            drainage_network_attributes = None
         return SimulationData(
             sim_time=sim_time,
             time_step=self.dt.total_seconds(),
@@ -348,7 +356,7 @@ class Simulation:
             accumulation_arrays=accumulation_arrays,
             cell_dx=self.raster_domain.dx,
             cell_dy=self.raster_domain.dy,
-            drainage_network_data=drainage_network_data,
+            drainage_network_attributes=drainage_network_attributes,
         )
 
     def set_array(
