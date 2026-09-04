@@ -1,7 +1,7 @@
 [project]
 name = "itzi-core"
-version = "0.5.0"
-description = "A cloud-native dynamic flood model."
+version = "0.6.0"
+description = "A flexible, API-first dynamic flood model."
 authors = [
     {name = "Laurent Courty", email = "lrntct@gmail.com"},
 ]
@@ -34,17 +34,13 @@ Issues = "https://github.com/ItziModel/itzi-core/issues/"
 
 
 [project.optional-dependencies]
-cloud = [
-    "icechunk>=2.0.6",
-    "obstore>=0.11.0",
-    "pandas>=3.0.3",
-    "pyproj>=3.7.2",
-    "xarray[io,parallel]>=2026.4.0",
-    "zarr>=3.2.1",
+xarray = [
+    "xarray>=2026.4.0",
 ]
 
 [dependency-groups]
 dev = [
+    "pyproj>=3.7.2",
     "pytest>=9.1",
     "pytest-cov==6.*",
     "pandas>=3.0.3",
@@ -78,7 +74,7 @@ pythonpath = ["src", "."]
 addopts = ["--import-mode=importlib", "--benchmark-min-rounds=7"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "cloud: marks tests using cloud functions (deselect with '-m \"not cloud\"')",
+    "xarray: marks tests using xarray (deselect with '-m \"not xarray\"')",
 ]
 
 [tool.ruff]
