@@ -9,7 +9,10 @@ from email.parser import BytesParser
 from pathlib import Path
 
 PROJECT_NAME = "itzi-core"
-EXPECTED_WHEEL_COUNT = 21
+# linux-amd64-libc, linux-amd64-musl, linux-arm64-libc, linux-arm64-musl, windows-amd6, macos
+SUPPORTED_ARCH = 6
+SUPPORTED_PYTHON_VER = 3
+EXPECTED_WHEEL_COUNT = SUPPORTED_ARCH * SUPPORTED_PYTHON_VER
 
 
 def version_from_tag(tag: str) -> str:
